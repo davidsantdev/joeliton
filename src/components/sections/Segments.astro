@@ -1,0 +1,170 @@
+---
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import PdvMockup from '@/components/mockups/PdvMockup.astro';
+import QuoteMockup from '@/components/mockups/QuoteMockup.astro';
+import { segments } from '@/data/content';
+import { messages, contactLink } from '@/config/site';
+---
+
+<section id="segmentos" class="cv relative overflow-hidden border-y hairline bg-ink-950/40 py-24 sm:py-32" aria-labelledby="segmentos-titulo">
+  <div class="seg-glow" aria-hidden="true"></div>
+  <div class="container-x relative">
+    <SectionHeading
+      id="segmentos-titulo"
+      eyebrow="Segmentos"
+      subtitle="Cada segmento tem o seu ritmo. Nossas soluções já chegam preparadas para as rotinas de supermercados e lojas de materiais de construção."
+    >
+      Especialistas em quem <span class="text-gradient">move o varejo</span>
+    </SectionHeading>
+
+    <div class="mt-12 flex justify-center" data-reveal style="--d: 160">
+      <div class="tabs" role="tablist" aria-label="Escolha um segmento" data-tabs>
+        <span class="tab-indicator" aria-hidden="true" data-tab-indicator></span>
+        {
+          segments.map((s, i) => (
+            <button
+              type="button"
+              role="tab"
+              id={`aba-${s.id}`}
+              aria-controls={`painel-${s.id}`}
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? 0 : -1}
+              class="tab"
+              data-tab
+            >
+              <Icon name={s.icon} size={17} />
+              <span class="hidden sm:inline">{s.tab}</span>
+              <span class="sm:hidden">{s.tabShort}</span>
+            </button>
+          ))
+        }
+      </div>
+    </div>
+
+    {
+      segments.map((s, i) => (
+        <div
+          role="tabpanel"
+          id={`painel-${s.id}`}
+          aria-labelledby={`aba-${s.id}`}
+          tabindex="0"
+          hidden={i !== 0}
+          class="panel mt-12 grid items-center gap-12 lg:mt-16 lg:grid-cols-[1fr_1.15fr] lg:gap-16"
+          data-panel
+        >
+          <div class="panel-copy">
+            <h3 class="text-2xl leading-tight font-bold tracking-[-0.03em] text-fg sm:text-[2rem]">{s.title}</h3>
+            <p class="mt-4 max-w-lg text-base leading-relaxed text-fg-muted sm:text-lg">{s.description}</p>
+            <ul class="mt-7 flex flex-col gap-3.5">
+              {s.bullets.map((b) => (
+                <li class="flex items-start gap-3 text-fg-muted">
+                  <span class="mt-0.5 inline-grid size-5 shrink-0 place-items-center rounded-full bg-accent-2/15 text-accent-2">
+                    <Icon name="check" size={13} strokeWidth={3} />
+                  </span>
+                  {b}
+                </li>
+              ))}
+            </ul>
+            <Button href={contactLink(messages.segment(s.cta))} arrow class="mt-9">
+              Quero ver na minha loja
+            </Button>
+          </div>
+          <div class="panel-visual">{s.id === 'supermercados' ? <PdvMockup /> : <QuoteMockup />}</div>
+        </div>
+      ))
+    }
+
+    <p class="mt-14 text-center text-sm text-fg-subtle" data-reveal>
+      Atende outro segmento do varejo?{' '}
+      <a href="#contato" class="font-medium text-accent underline-offset-4 hover:underline">Fale com a gente</a> — adaptamos
+      a solução à sua operação.
+    </p>
+  </div>
+</section>
+
+<style>
+  .seg-glow {
+    position: absolute;
+    left: 50%;
+    top: 55%;
+    width: min(900px, 90vw);
+    height: 520px;
+    translate: -50% -50%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, color-mix(in oklab, var(--color-brand-600) 14%, transparent) 15%, transparent);
+    pointer-events: none;
+  }
+
+  .tabs {
+    position: relative;
+    display: inline-flex;
+    padding: 0.35rem;
+    border-radius: 999px;
+    border: 1px solid var(--hairline-strong);
+    background: color-mix(in oklab, var(--mist) 3%, transparent);
+  }
+  .tab {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.15rem;
+    border-radius: 999px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--fg-muted);
+    white-space: nowrap;
+    transition: color 0.3s;
+    cursor: pointer;
+  }
+  .tab:hover,
+  .tab[aria-selected='true'] {
+    color: var(--fg);
+  }
+  .tab[aria-selected='true'] :global(svg) {
+    color: var(--accent-2);
+  }
+  .tab-indicator {
+    position: absolute;
+    top: 0.35rem;
+    bottom: 0.35rem;
+    left: 0;
+    width: var(--w, 0);
+    transform: translateX(var(--x, 0));
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--mist) 9%, transparent);
+    border: 1px solid var(--hairline-strong);
+    box-shadow: 0 6px 20px -8px rgb(0 0 0 / 0.5);
+    transition:
+      transform 0.5s var(--ease-out-expo),
+      width 0.5s var(--ease-out-expo);
+  }
+  @media (width < 30rem) {
+    .tab {
+      padding: 0.65rem 0.85rem;
+      font-size: 0.85rem;
+    }
+  }
+
+  .panel:not([hidden]) {
+    animation: panel-in 0.7s var(--ease-out-expo);
+  }
+  .panel:focus-visible {
+    outline-offset: 8px;
+    border-radius: 1rem;
+  }
+  @keyframes panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+</style>
+
+<script>
+  import { initTabs } from '@/scripts/tabs';
+  initTabs();
+</script>

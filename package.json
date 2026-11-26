@@ -1,0 +1,37 @@
+{
+  "name": "jesolution-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Site institucional da J&E Soluções — automação comercial para o varejo.",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "format": "prettier --write .",
+    "brand": "node scripts/brand-assets.mjs",
+    "og": "node scripts/og-image.mjs"
+  },
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.6",
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
+    "@tailwindcss/vite": "^4.3.5",
+    "astro": "^7.4.13",
+    "lucide-static": "^1.79.0",
+    "sharp": "^0.35.5",
+    "tailwindcss": "^4.3.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "prettier": "^3.10.1",
+    "prettier-plugin-astro": "^1.1.2",
+    "puppeteer-core": "^25.18.1",
+    "typescript": "^5.9.3"
+  }
+}

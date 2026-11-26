@@ -1,0 +1,59 @@
+---
+/**
+ * Depoimentos — só renderiza quando houver itens em `testimonials` (src/data/content.ts).
+ * Aceita texto e/ou vídeo vertical (9:16), no mesmo espírito da referência.
+ */
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { testimonials } from '@/data/content';
+---
+
+{
+  testimonials.length > 0 && (
+    <section id="depoimentos" class="cv relative py-24 sm:py-32" aria-labelledby="depoimentos-titulo">
+      <div class="container-x">
+        <SectionHeading
+          id="depoimentos-titulo"
+          eyebrow="Depoimentos"
+          subtitle="Quem já usa no dia a dia conta como foi."
+        >
+          O que nossos <span class="text-gradient">clientes dizem</span>
+        </SectionHeading>
+
+        <div class="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {testimonials.map((t, i) => (
+            <figure class="spot flex flex-col overflow-hidden" data-reveal style={`--d:${i * 90}`}>
+              {t.video && (
+                <div class="relative aspect-[9/16] max-h-[28rem] w-full bg-ink-900">
+                  <video
+                    src={t.video}
+                    poster={t.poster}
+                    controls
+                    playsinline
+                    preload="none"
+                    class="h-full w-full object-cover"
+                  />
+                </div>
+              )}
+              <div class="flex flex-1 flex-col p-6">
+                <Icon name="message-square-more" size={22} class="text-accent-2" />
+                <blockquote class="mt-4 flex-1 text-base leading-relaxed font-medium text-fg">“{t.quote}”</blockquote>
+                <figcaption class="mt-6 flex items-center gap-3 border-t hairline pt-4">
+                  <span class="inline-grid size-10 place-items-center rounded-xl bg-gradient-to-br from-brand-600 to-aqua-500 font-display font-bold text-white">
+                    {t.company.charAt(0)}
+                  </span>
+                  <span>
+                    <span class="block text-sm font-semibold text-fg">{t.author ?? t.company}</span>
+                    <span class="block text-xs text-fg-subtle">
+                      {t.author ? `${t.role ? `${t.role} · ` : ''}${t.company}` : t.context}
+                    </span>
+                  </span>
+                </figcaption>
+              </div>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}

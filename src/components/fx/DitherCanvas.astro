@@ -1,0 +1,48 @@
+---
+/**
+ * Camada de fundo animada (ver src/scripts/dither.ts).
+ * Deve ficar dentro de um elemento posicionado; o pai mais próximo com [data-dither-host]
+ * recebe os eventos de ponteiro.
+ */
+interface Props {
+  class?: string;
+  /** Tamanho de cada célula do dither, em px CSS */
+  cell?: number;
+  /** Cobertura do campo (0–1.2) */
+  density?: number;
+  /** Centro da composição em UV ("x,y", origem embaixo à esquerda) */
+  focus?: string;
+  speed?: number;
+  /** Esmaece a parte de baixo dentro do próprio shader (evita mask CSS sobre camada animada) */
+  fadeBottom?: boolean;
+}
+
+const { class: className, cell = 3, density = 1, focus = '0.5,0.62', speed = 1, fadeBottom = false } = Astro.props;
+---
+
+<canvas
+  class:list={['dither pointer-events-none', className]}
+  data-dither
+  data-cell={cell}
+  data-density={density}
+  data-focus={focus}
+  data-speed={speed}
+  data-fade-bottom={fadeBottom ? '1' : '0'}
+  aria-hidden="true"></canvas>
+
+<style>
+  .dither {
+    image-rendering: pixelated;
+    opacity: 0;
+    mix-blend-mode: var(--shader-blend);
+    transition: opacity 1.6s var(--ease-out-expo);
+  }
+  .dither:global(.is-ready) {
+    opacity: var(--shader-opacity);
+  }
+</style>
+
+<script>
+  import { initDither } from '@/scripts/dither';
+  initDither();
+</script>

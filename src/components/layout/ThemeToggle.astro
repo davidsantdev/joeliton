@@ -1,0 +1,47 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<button
+  type="button"
+  class:list={[
+    'theme-toggle relative inline-flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-mist/10 bg-mist/[0.03] text-fg-muted transition-colors duration-300 hover:border-mist/20 hover:text-fg',
+    className,
+  ]}
+  data-theme-toggle
+  aria-label="Ativar tema claro"
+>
+  <Icon name="sun" size={17} class="icon-sun" />
+  <Icon name="moon" size={17} class="icon-moon" />
+</button>
+
+<style>
+  .theme-toggle :global(svg) {
+    position: absolute;
+    transition:
+      transform 0.55s var(--ease-out-expo),
+      opacity 0.3s;
+  }
+  .theme-toggle :global(.icon-moon) {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.4);
+  }
+  :global([data-theme='light']) .theme-toggle :global(.icon-sun) {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.4);
+  }
+  :global([data-theme='light']) .theme-toggle :global(.icon-moon) {
+    opacity: 1;
+    transform: none;
+  }
+</style>
+
+<script>
+  import { initThemeToggles } from '@/scripts/theme';
+  initThemeToggles();
+</script>

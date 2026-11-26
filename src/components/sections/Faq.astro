@@ -1,0 +1,95 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import Button from '@/components/ui/Button.astro';
+import { faq } from '@/data/content';
+import { contactLink, hasWhatsapp, messages } from '@/config/site';
+---
+
+<section id="duvidas" class="cv relative border-t hairline bg-ink-950/40 py-24 sm:py-32" aria-labelledby="duvidas-titulo">
+  <div class="container-x grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
+    <div class="lg:sticky lg:top-32 lg:self-start">
+      <span class="eyebrow" data-reveal>Dúvidas frequentes</span>
+      <h2
+        id="duvidas-titulo"
+        class="mt-5 text-[2.15rem] leading-[1.06] font-bold tracking-[-0.035em] text-fg sm:text-5xl"
+        data-reveal
+        style="--d: 60"
+      >
+        Ficou alguma <span class="text-gradient">dúvida</span><span class="punct">?</span>
+      </h2>
+      <p class="mt-5 max-w-md text-base leading-relaxed text-fg-muted sm:text-lg" data-reveal style="--d: 120">
+        Reunimos as perguntas que mais ouvimos de quem está escolhendo um sistema. Não achou a sua? Pergunta pra gente.
+      </p>
+      <div class="mt-8" data-reveal style="--d: 180">
+        <Button href={contactLink(messages.talk)} variant="outline">
+          {
+            hasWhatsapp ? (
+              <Icon name="whatsapp" size={18} class="text-whatsapp" />
+            ) : (
+              <Icon name="mail" size={18} class="text-accent-2" />
+            )
+          }
+          {hasWhatsapp ? 'Perguntar no WhatsApp' : 'Perguntar por e-mail'}
+        </Button>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-3">
+      {
+        faq.map((item, i) => (
+          <details class="faq spot" name="faq" open={i === 0} data-reveal style={`--d:${i * 60}`}>
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-6 p-5 font-display text-[1.05rem] font-semibold tracking-[-0.01em] text-fg sm:p-6 sm:text-lg">
+              {item.q}
+              <span class="chev inline-grid size-8 shrink-0 place-items-center rounded-full border border-mist/10 text-fg-muted">
+                <Icon name="chevron-down" size={17} strokeWidth={2} />
+              </span>
+            </summary>
+            <div class="answer px-5 pb-6 text-[0.98rem] leading-relaxed text-fg-muted sm:px-6">
+              <p>{item.a}</p>
+            </div>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq {
+    border-radius: 1.1rem;
+    interpolate-size: allow-keywords;
+  }
+  .faq summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq summary:focus-visible {
+    outline-offset: -2px;
+    border-radius: 1.1rem;
+  }
+  .chev {
+    transition:
+      transform 0.45s var(--ease-out-expo),
+      background-color 0.3s,
+      color 0.3s;
+  }
+  .faq[open] .chev {
+    transform: rotate(180deg);
+    color: var(--accent-2);
+    background: color-mix(in oklab, var(--accent-2) 12%, transparent);
+  }
+  .faq[open] {
+    border-color: var(--hairline-strong);
+  }
+
+  /* abre/fecha com altura animada onde houver suporte (::details-content + interpolate-size) */
+  .faq::details-content {
+    height: 0;
+    overflow: clip;
+    transition:
+      height 0.5s var(--ease-out-expo),
+      content-visibility 0.5s allow-discrete;
+  }
+  .faq[open]::details-content {
+    height: auto;
+  }
+</style>

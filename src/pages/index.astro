@@ -1,0 +1,76 @@
+---
+import Base from '@/layouts/Base.astro';
+import Header from '@/components/layout/Header.astro';
+import Footer from '@/components/layout/Footer.astro';
+import WhatsAppFab from '@/components/layout/WhatsAppFab.astro';
+import ScrollProgress from '@/components/layout/ScrollProgress.astro';
+import Hero from '@/components/sections/Hero.astro';
+import SegmentsMarquee from '@/components/sections/SegmentsMarquee.astro';
+import Solutions from '@/components/sections/Solutions.astro';
+import Segments from '@/components/sections/Segments.astro';
+import Process from '@/components/sections/Process.astro';
+import About from '@/components/sections/About.astro';
+import Testimonials from '@/components/sections/Testimonials.astro';
+import Faq from '@/components/sections/Faq.astro';
+import Contact from '@/components/sections/Contact.astro';
+
+import { hasWhatsapp, site } from '@/config/site';
+import { faq } from '@/data/content';
+
+const sameAs = Object.values(site.social).filter(Boolean);
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: site.name,
+    url: site.url,
+    logo: new URL('/icon-512.png', site.url).href,
+    description: site.description,
+    email: site.contact.email,
+    ...(sameAs.length ? { sameAs } : {}),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: site.name,
+    url: site.url,
+    inLanguage: 'pt-BR',
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faq.map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: { '@type': 'Answer', text: item.a },
+    })),
+  },
+];
+---
+
+<Base jsonLd={jsonLd}>
+  <ScrollProgress />
+  <Header />
+  <main id="conteudo">
+    <Hero />
+    <SegmentsMarquee />
+    <Solutions />
+    <Segments />
+    <Process />
+    <About />
+    <Testimonials />
+    <Faq />
+    <Contact />
+  </main>
+  <Footer />
+  {hasWhatsapp && <WhatsAppFab />}
+</Base>
+
+<script>
+  import { initAnimationPausing, initReveal, initScrollProgress, initSpotlight } from '@/scripts/interactions';
+  initReveal();
+  initAnimationPausing();
+  initSpotlight();
+  initScrollProgress();
+</script>

@@ -1,0 +1,161 @@
+---
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import DitherCanvas from '@/components/fx/DitherCanvas.astro';
+import DashboardMockup from '@/components/mockups/DashboardMockup.astro';
+import { messages, site, contactLink } from '@/config/site';
+
+// a pontuação vai num <span class="punct"> para compensar o espaçamento largo da fonte display
+const lineOne = ['Do', 'caixa', 'ao', 'estoque'];
+const lineTwo = ['sua', 'loja'];
+
+const proof = ['Emissão de NFC-e e NF-e', 'Implantação acompanhada', 'Suporte humanizado'];
+---
+
+<section id="inicio" class="hero relative isolate overflow-hidden pt-32 sm:pt-40" data-dither-host>
+  <!-- fundo: gradiente (fallback) + dither WebGL + grid + vinheta -->
+  <div class="hero-fallback absolute inset-x-0 top-0 -z-30 h-[1100px]" aria-hidden="true"></div>
+  <DitherCanvas class="absolute inset-x-0 top-0 -z-20 h-[880px] w-full" cell={2} density={1.05} focus="0.5,0.6" fadeBottom />
+  <div class="bg-grid absolute inset-x-0 top-0 -z-10 h-[900px] opacity-60" aria-hidden="true"></div>
+  <div class="hero-vignette absolute inset-x-0 top-0 -z-10 h-[900px]" aria-hidden="true"></div>
+
+  <div class="container-x relative">
+    <div class="mx-auto flex max-w-5xl flex-col items-center text-center">
+      <a href="#segmentos" class="pill enter group" style="--d: 0">
+        <span class="live-dot"></span>
+        {site.tagline}
+        <Icon
+          name="arrow-right"
+          size={14}
+          strokeWidth={2.2}
+          class="-mr-1 text-fg-subtle transition-transform duration-300 group-hover:translate-x-0.5"
+        />
+      </a>
+
+      <h1
+        class="mt-8 text-[2.6rem] leading-[1.02] font-extrabold tracking-[-0.045em] text-fg sm:text-6xl md:text-7xl lg:text-[5.1rem]"
+      >
+        <span class="sm:block">
+          {
+            lineOne.map((w, i) => (
+              <>
+                <span class="word" style={`--i:${i}`}>
+                  {w}
+                  {i === lineOne.length - 1 && <span class="punct">,</span>}
+                </span>{' '}
+              </>
+            ))
+          }
+        </span>
+        {
+          lineTwo.map((w, i) => (
+            <>
+              <span class="word" style={`--i:${i + lineOne.length}`}>
+                {w}
+              </span>{' '}
+            </>
+          ))
+        }
+        <span class="word text-gradient" style={`--i:${lineOne.length + lineTwo.length}`}>
+          no controle<span class="punct">.</span>
+        </span>
+      </h1>
+
+      <p class="enter mx-auto mt-7 max-w-2xl text-base leading-relaxed text-fg-muted sm:text-lg" style="--d: 420">
+        Sistemas de gestão e automação comercial para{' '}
+        <strong class="font-semibold text-fg">supermercados</strong> e{' '}
+        <strong class="font-semibold text-fg">lojas de materiais de construção</strong> — com implantação acompanhada
+        de perto, suporte humanizado e soluções sob medida.
+      </p>
+
+      <div class="enter mt-10 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row" style="--d: 540">
+        <Button href={contactLink(messages.demo)} size="lg" arrow class="w-full sm:w-auto">
+          Agendar demonstração
+        </Button>
+        <Button href="#solucoes" variant="outline" size="lg" class="w-full sm:w-auto">
+          <Icon name="layout-dashboard" size={18} class="text-accent-2" />
+          Conhecer soluções
+        </Button>
+      </div>
+
+      <ul class="enter mt-9 flex flex-wrap items-center justify-center gap-x-6 gap-y-2.5 text-sm text-fg-muted" style="--d: 680">
+        {
+          proof.map((item) => (
+            <li class="inline-flex items-center gap-2">
+              <Icon name="circle-check" size={16} strokeWidth={2} class="text-accent-2" />
+              {item}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <!-- painel ilustrativo -->
+    <div class="hero-stage relative mx-auto mt-16 max-w-6xl pb-10 sm:mt-20 lg:px-6">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="hero-tilt enter" style="--d: 760">
+        <DashboardMockup />
+      </div>
+      <p class="mt-5 text-center text-xs text-fg-subtle">Interface ilustrativa.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero-fallback {
+    background:
+      radial-gradient(48% 38% at 50% 22%, color-mix(in oklab, var(--color-brand-500) 22%, transparent), transparent 70%),
+      radial-gradient(35% 30% at 72% 30%, color-mix(in oklab, var(--color-aqua-400) 14%, transparent), transparent 70%);
+  }
+  /* sem WebGL / sem GPU: um padrão de pontos estático mantém a "assinatura" do dither */
+  .hero-fallback::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(color-mix(in oklab, var(--color-aqua-400) 55%, transparent) 1px, transparent 1.4px);
+    background-size: 7px 7px;
+    opacity: 0.3;
+    transition: opacity 1.2s;
+  }
+  .hero:has(:global(.dither.is-ready)) .hero-fallback::after {
+    opacity: 0;
+  }
+  .hero-vignette {
+    background: radial-gradient(ellipse 60% 52% at 50% 30%, transparent 10%, var(--bg) 78%);
+  }
+
+  .hero-glow {
+    position: absolute;
+    inset: 8% 10% 20%;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, color-mix(in oklab, var(--color-brand-500) 34%, transparent) 20%, transparent);
+    opacity: 0.7;
+  }
+  :global([data-theme='light']) .hero-glow {
+    opacity: 0.35;
+  }
+
+  /* inclinação 3D que "endireita" conforme a página rola (scroll-driven animations) */
+  .hero-tilt {
+    transform-origin: 50% 0%;
+  }
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) and (min-width: 48rem) {
+      .hero-tilt :global(.dash) {
+        animation: tilt-in linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 45%;
+        transform-origin: 50% 0%;
+      }
+    }
+  }
+  @keyframes tilt-in {
+    from {
+      transform: perspective(1800px) rotateX(14deg) scale(0.96);
+    }
+    to {
+      transform: perspective(1800px) rotateX(0deg) scale(1);
+    }
+  }
+</style>

@@ -1,0 +1,775 @@
+---
+/**
+ * Interface ILUSTRATIVA de um painel de gestão (HTML/CSS/SVG puro, sem imagens).
+ * Os números são coerentes entre si (faturamento = soma do gráfico; ticket = faturamento / vendas)
+ * e o feed "ao vivo" atualiza os KPIs — ver src/scripts/dashboard.ts.
+ *
+ * Tudo é dimensionado em `em`, e o font-size da raiz deriva da largura do container
+ * (container queries), então o mockup escala como uma imagem — mas nítido.
+ */
+import { Image } from 'astro:assets';
+import Icon from '@/components/ui/Icon.astro';
+import logoMark from '@/assets/brand/logo-mark.png';
+import { areaPath, brl, num, smoothPath, toPoints } from '@/lib/chart';
+import type { IconName } from '@/lib/icons';
+
+// vendas por hora, em milhares de R$ (7h → 18h)
+const today = [0.42, 0.95, 1.31, 1.58, 2.12, 2.46, 1.84, 1.49, 1.63, 1.97, 2.54, 2.12];
+const yesterday = [0.38, 0.82, 1.2, 1.45, 1.9, 2.3, 1.7, 1.35, 1.5, 1.8, 2.3, 2.05];
+
+const W = 600;
+const H = 210;
+const ptsToday = toPoints(today, { width: W, height: H, max: 3 });
+const ptsYesterday = toPoints(yesterday, { width: W, height: H, max: 3 });
+const peakIndex = 10; // 17h
+const peak = ptsToday[peakIndex];
+
+const revenue = 20431.9;
+const sales = 300;
+const base = { revenue: 18750, sales: 284 };
+const ticket = revenue / sales;
+const baseTicket = base.revenue / base.sales;
+const pct = (a: number, b: number) => `${num((a / b - 1) * 100, 1)}%`;
+
+const kpis: { icon: IconName; label: string; value: string; delta: string; key?: string }[] = [
+  { icon: 'wallet', label: 'Faturamento', value: brl.format(revenue), delta: pct(revenue, base.revenue), key: 'revenue' },
+  { icon: 'receipt-text', label: 'Vendas', value: String(sales), delta: pct(sales, base.sales), key: 'sales' },
+  { icon: 'shopping-cart', label: 'Ticket médio', value: brl.format(ticket), delta: pct(ticket, baseTicket), key: 'ticket' },
+  { icon: 'chart-line', label: 'Margem bruta', value: '27,4%', delta: '0,8 p.p.' },
+];
+
+const feed = [
+  { doc: 'NFC-e', n: '4.912', time: '18:39', pay: 'PIX', amount: 129.9 },
+  { doc: 'NFC-e', n: '4.911', time: '18:38', pay: 'Crédito', amount: 54.37 },
+  { doc: 'NF-e', n: '1.207', time: '18:36', pay: 'Boleto', amount: 1860 },
+  { doc: 'NFC-e', n: '4.910', time: '18:35', pay: 'Débito', amount: 212.48 },
+  { doc: 'NFC-e', n: '4.909', time: '18:33', pay: 'Dinheiro', amount: 23.15 },
+];
+
+const side: IconName[] = ['layout-dashboard', 'shopping-cart', 'boxes', 'receipt-text', 'wallet', 'chart-column'];
+const xLabels = ['7h', '9h', '11h', '13h', '15h', '17h'];
+---
+
+<div class="dash-wrap" data-anim data-dash data-base={JSON.stringify(base)}>
+  <div
+    class="dash"
+    role="img"
+    aria-label="Ilustração de um painel de gestão com faturamento do dia, vendas por hora e as últimas notas fiscais emitidas"
+  >
+    <div class="chrome">
+      <span class="lights"><i></i><i></i><i></i></span>
+      <span class="chrome-title">Painel de gestão · Loja Centro</span>
+      <span class="sync"><Icon name="cloud-check" size="1.15em" /> Sincronizado</span>
+    </div>
+
+    <div class="body">
+      <div class="side">
+        <span class="side-logo">
+          <Image src={logoMark} alt="" width={64} loading="eager" class="side-logo-img" />
+        </span>
+        {
+          side.map((name, i) => (
+            <span class:list={['side-item', i === 0 && 'is-active']}>
+              <Icon name={name} size="1.3em" />
+            </span>
+          ))
+        }
+        <span class="side-spacer"></span>
+        <span class="side-item"><Icon name="settings" size="1.3em" /></span>
+      </div>
+
+      <div class="main">
+        <div class="topbar">
+          <span class="search"><Icon name="search" size="1.1em" /> Buscar produtos, clientes ou notas…</span>
+          <span class="top-actions">
+            <span class="bell"><Icon name="bell" size="1.15em" /><i></i></span>
+            <span class="avatar">JE</span>
+          </span>
+        </div>
+
+        <div class="head">
+          <div>
+            <p class="kicker">Visão geral · hoje, 18h40</p>
+            <p class="h">Resumo do dia</p>
+          </div>
+          <div class="range"><span class="is-on">Hoje</span><span>7 dias</span><span>30 dias</span></div>
+        </div>
+
+        <div class="kpis">
+          {
+            kpis.map((k) => (
+              <div class="kpi">
+                <div class="kpi-top">
+                  <span class="kpi-ico">
+                    <Icon name={k.icon} size="1.1em" />
+                  </span>
+                  {k.label}
+                </div>
+                <p class="kpi-value" data-kpi={k.key}>
+                  {k.value}
+                </p>
+                <p class="kpi-delta">
+                  <span data-kpi-delta={k.key}>▲ {k.delta}</span> <span class="vs">vs. ontem</span>
+                </p>
+              </div>
+            ))
+          }
+        </div>
+
+        <div class="row">
+          <div class="card chart">
+            <div class="card-head">
+              <p class="card-title">Vendas por hora</p>
+              <div class="legend">
+                <span><i class="l-today"></i>Hoje</span>
+                <span><i class="l-yest"></i>Ontem</span>
+              </div>
+            </div>
+            <div class="plot" data-inview>
+              <svg viewBox={`0 0 ${W} ${H}`} class="plot-svg" aria-hidden="true">
+                <defs>
+                  <linearGradient id="dash-area" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" style="stop-color: var(--accent); stop-opacity: 0.32"></stop>
+                    <stop offset="1" style="stop-color: var(--accent); stop-opacity: 0"></stop>
+                  </linearGradient>
+                  <linearGradient id="dash-line" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" style="stop-color: var(--grad-from)"></stop>
+                    <stop offset="1" style="stop-color: var(--grad-to)"></stop>
+                  </linearGradient>
+                </defs>
+                {[0.25, 0.5, 0.75].map((f) => <line x1="0" x2={W} y1={H * f} y2={H * f} class="grid" />)}
+                <path d={areaPath(ptsToday, H)} fill="url(#dash-area)" class="area"></path>
+                <path d={smoothPath(ptsYesterday)} class="line-yest"></path>
+                <path d={smoothPath(ptsToday)} class="line-today" pathLength="1"></path>
+                <line x1={peak.x} x2={peak.x} y1={peak.y} y2={H} class="peak-rule"></line>
+                <circle cx={peak.x} cy={peak.y} r="9" class="peak-halo"></circle>
+                <circle cx={peak.x} cy={peak.y} r="4.5" class="peak-dot"></circle>
+              </svg>
+              <span class="tip" style={`left:${(peak.x / W) * 100}%; top:${(peak.y / H) * 100}%`}>
+                <b>17h</b> · {brl.format(today[peakIndex] * 1000)}
+              </span>
+            </div>
+            <div class="x-axis">{xLabels.map((l) => <span>{l}</span>)}</div>
+          </div>
+
+          <div class="card feed">
+            <div class="card-head">
+              <p class="card-title">Últimas vendas</p>
+              <span class="live"><i></i>ao vivo</span>
+            </div>
+            <ul class="feed-list" data-feed>
+              {
+                feed.map((r) => (
+                  <li class="feed-row">
+                    <span class="f-ico">
+                      <Icon name="receipt" size="1.05em" />
+                    </span>
+                    <span class="f-main">
+                      <b>
+                        {r.doc} {r.n}
+                      </b>
+                      <small>
+                        {r.time} · {r.pay}
+                      </small>
+                    </span>
+                    <span class="f-side">
+                      <b>{brl.format(r.amount)}</b>
+                      <small class="ok">Autorizada</small>
+                    </span>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- notificações flutuantes (desktop) -->
+  <div class="chip chip-1" aria-hidden="true">
+    <span class="chip-ico ok"><Icon name="file-check" size="1.2em" /></span>
+    <span><b>NFC-e autorizada</b><small>Nº 4.912 · R$ 129,90</small></span>
+  </div>
+  <div class="chip chip-2" aria-hidden="true">
+    <span class="chip-ico warn"><Icon name="package" size="1.2em" /></span>
+    <span>
+      <b>Estoque baixo</b><small>Cimento CP II 50 kg · 12 sc</small>
+      <span class="chip-bar"><i></i></span>
+    </span>
+  </div>
+</div>
+
+<style>
+  .dash-wrap {
+    container-type: inline-size;
+    position: relative;
+  }
+
+  .dash {
+    --line: var(--hairline);
+    font-size: calc(100cqi / 84);
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.4em;
+    border: 1px solid var(--hairline-strong);
+    background: var(--ink-850);
+    box-shadow:
+      0 0 0 0.45em color-mix(in oklab, var(--mist) 3%, transparent),
+      0 3em 8em -2em rgb(0 0 0 / 0.55);
+    color: var(--fg);
+    text-align: left;
+    user-select: none;
+  }
+  :global([data-theme='light']) .dash {
+    box-shadow:
+      0 0 0 0.45em color-mix(in oklab, var(--mist) 4%, transparent),
+      0 3em 7em -2.5em rgb(20 40 90 / 0.3);
+  }
+
+  /* ---------- janela ---------- */
+  .chrome {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    height: 2.8em;
+    padding-inline: 1.2em;
+    border-bottom: 1px solid var(--line);
+    background: color-mix(in oklab, var(--ink-800) 70%, transparent);
+  }
+  .lights {
+    display: flex;
+    gap: 0.45em;
+  }
+  .lights i {
+    width: 0.75em;
+    height: 0.75em;
+    border-radius: 99px;
+    background: color-mix(in oklab, var(--mist) 16%, transparent);
+  }
+  .chrome-title {
+    flex: 1;
+    text-align: center;
+    font-size: 0.85em;
+    color: var(--fg-subtle);
+  }
+  .sync {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    font-size: 0.8em;
+    color: var(--color-ok);
+  }
+
+  .body {
+    display: grid;
+    grid-template-columns: 4.4em 1fr;
+  }
+
+  /* ---------- barra lateral ---------- */
+  .side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.55em;
+    padding: 1.1em 0;
+    border-right: 1px solid var(--line);
+    background: color-mix(in oklab, var(--ink-900) 55%, transparent);
+  }
+  .side-logo {
+    display: grid;
+    place-items: center;
+    width: 2.6em;
+    height: 2.6em;
+    margin-bottom: 0.7em;
+  }
+  .side-logo :global(.side-logo-img) {
+    width: 2.2em;
+    height: auto;
+  }
+  .side-item {
+    display: grid;
+    place-items: center;
+    width: 2.7em;
+    height: 2.7em;
+    border-radius: 0.8em;
+    color: var(--fg-subtle);
+  }
+  .side-item.is-active {
+    color: var(--accent);
+    background: color-mix(in oklab, var(--accent) 14%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--accent) 25%, transparent);
+  }
+  .side-spacer {
+    flex: 1;
+  }
+
+  /* ---------- área principal ---------- */
+  .main {
+    padding: 1.3em 1.6em 1.6em;
+    min-width: 0;
+  }
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1em;
+  }
+  .search {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    width: 26em;
+    height: 2.5em;
+    padding-inline: 0.9em;
+    border-radius: 0.8em;
+    border: 1px solid var(--line);
+    background: color-mix(in oklab, var(--mist) 2.5%, transparent);
+    color: var(--fg-subtle);
+    font-size: 0.88em;
+  }
+  .top-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.8em;
+  }
+  .bell {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 2.4em;
+    height: 2.4em;
+    border-radius: 99px;
+    border: 1px solid var(--line);
+    color: var(--fg-muted);
+  }
+  .bell i {
+    position: absolute;
+    top: 0.55em;
+    right: 0.6em;
+    width: 0.45em;
+    height: 0.45em;
+    border-radius: 99px;
+    background: var(--color-aqua-400);
+  }
+  .avatar {
+    display: grid;
+    place-items: center;
+    width: 2.4em;
+    height: 2.4em;
+    border-radius: 99px;
+    font-size: 0.85em;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, var(--color-brand-600), var(--color-aqua-500));
+  }
+
+  .head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin: 1.5em 0 1.1em;
+  }
+  .kicker {
+    font-size: 0.82em;
+    color: var(--fg-subtle);
+  }
+  .h {
+    margin-top: 0.2em;
+    font-family: var(--font-display);
+    font-size: 1.55em;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .range {
+    display: flex;
+    padding: 0.25em;
+    border-radius: 0.8em;
+    border: 1px solid var(--line);
+    font-size: 0.82em;
+    color: var(--fg-subtle);
+  }
+  .range span {
+    padding: 0.4em 0.9em;
+    border-radius: 0.6em;
+  }
+  .range .is-on {
+    color: var(--fg);
+    background: color-mix(in oklab, var(--mist) 7%, transparent);
+  }
+
+  /* ---------- KPIs ---------- */
+  .kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.9em;
+  }
+  .kpi,
+  .card {
+    border-radius: 1em;
+    border: 1px solid var(--line);
+    background: color-mix(in oklab, var(--ink-800) 55%, transparent);
+  }
+  .kpi {
+    padding: 1em 1.1em;
+  }
+  .kpi-top {
+    display: flex;
+    align-items: center;
+    gap: 0.55em;
+    font-size: 0.85em;
+    color: var(--fg-muted);
+  }
+  .kpi-ico {
+    display: grid;
+    place-items: center;
+    width: 1.9em;
+    height: 1.9em;
+    border-radius: 0.55em;
+    color: var(--accent-2);
+    background: color-mix(in oklab, var(--accent-2) 13%, transparent);
+  }
+  .kpi-value {
+    margin-top: 0.6em;
+    font-family: var(--font-display);
+    font-size: 1.65em;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    transition: color 0.6s;
+  }
+  .kpi-value:global(.is-bump) {
+    color: var(--accent-2);
+    transition: none;
+  }
+  .kpi-delta {
+    margin-top: 0.35em;
+    font-size: 0.78em;
+    font-weight: 600;
+    color: var(--color-ok);
+  }
+  .kpi-delta .vs {
+    font-weight: 400;
+    color: var(--fg-subtle);
+  }
+
+  /* ---------- linha: gráfico + feed ---------- */
+  .row {
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    gap: 0.9em;
+    margin-top: 0.9em;
+  }
+  .card {
+    padding: 1.1em 1.2em 1em;
+    min-width: 0;
+  }
+  .card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.8em;
+  }
+  .card-title {
+    font-size: 0.95em;
+    font-weight: 600;
+  }
+  .legend {
+    display: flex;
+    gap: 1em;
+    font-size: 0.78em;
+    color: var(--fg-subtle);
+  }
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+  }
+  .legend i {
+    width: 1em;
+    height: 0.2em;
+    border-radius: 99px;
+  }
+  .l-today {
+    background: linear-gradient(90deg, var(--grad-from), var(--grad-to));
+  }
+  .l-yest {
+    background: color-mix(in oklab, var(--mist) 30%, transparent);
+  }
+
+  .plot {
+    position: relative;
+  }
+  .plot-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .grid {
+    stroke: var(--line);
+    stroke-width: 1;
+  }
+  .line-yest {
+    fill: none;
+    stroke: color-mix(in oklab, var(--mist) 24%, transparent);
+    stroke-width: 1.6;
+    stroke-dasharray: 4 6;
+  }
+  .line-today {
+    fill: none;
+    stroke: url(#dash-line);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  .area {
+    opacity: 0;
+    transition: opacity 1.2s 0.6s;
+  }
+  .peak-rule {
+    stroke: color-mix(in oklab, var(--accent-2) 45%, transparent);
+    stroke-dasharray: 3 4;
+  }
+  .peak-dot {
+    fill: var(--ink-850);
+    stroke: var(--accent-2);
+    stroke-width: 2.5;
+  }
+  .peak-halo {
+    fill: color-mix(in oklab, var(--accent-2) 22%, transparent);
+  }
+  .peak-rule,
+  .peak-dot,
+  .peak-halo,
+  .tip {
+    opacity: 0;
+    transition: opacity 0.6s 1.4s;
+  }
+  .tip {
+    position: absolute;
+    transform: translate(-108%, -130%);
+    white-space: nowrap;
+    padding: 0.45em 0.7em;
+    border-radius: 0.6em;
+    font-size: 0.78em;
+    color: var(--fg);
+    background: var(--ink-700);
+    border: 1px solid var(--hairline-strong);
+    box-shadow: 0 0.8em 1.6em -0.6em rgb(0 0 0 / 0.5);
+  }
+  .tip b {
+    color: var(--accent-2);
+  }
+  .plot:global(.is-in) .line-today {
+    animation: draw 1.8s var(--ease-in-out-quart) 0.2s forwards;
+  }
+  .plot:global(.is-in) :is(.area, .peak-rule, .peak-dot, .peak-halo, .tip) {
+    opacity: 1;
+  }
+  html:not(:global(.js)) .line-today {
+    stroke-dashoffset: 0;
+  }
+  html:not(:global(.js)) :is(.area, .peak-rule, .peak-dot, .peak-halo, .tip) {
+    opacity: 1;
+  }
+  .x-axis {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5em;
+    font-size: 0.72em;
+    color: var(--fg-subtle);
+  }
+
+  /* ---------- feed ---------- */
+  .live {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    font-size: 0.75em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-ok);
+  }
+  .live i {
+    width: 0.55em;
+    height: 0.55em;
+    border-radius: 99px;
+    background: currentColor;
+    box-shadow: 0 0 0 0.25em color-mix(in oklab, currentColor 25%, transparent);
+    animation: blink 1.6s steps(1) infinite;
+  }
+  .feed-list {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .feed-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.75em;
+    padding: 0.55em 0.5em;
+    margin-inline: -0.5em;
+    border-radius: 0.7em;
+  }
+  .feed-row + .feed-row {
+    border-top: 1px solid var(--line);
+  }
+  .feed-row:global(.is-new) {
+    animation: row-in 1.4s var(--ease-out-expo);
+  }
+  .f-ico {
+    display: grid;
+    place-items: center;
+    width: 2.1em;
+    height: 2.1em;
+    border-radius: 0.6em;
+    color: var(--accent);
+    background: color-mix(in oklab, var(--accent) 12%, transparent);
+  }
+  .f-main,
+  .f-side {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15em;
+    min-width: 0;
+  }
+  .f-side {
+    align-items: flex-end;
+  }
+  .feed-row b {
+    font-size: 0.86em;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .feed-row small {
+    font-size: 0.74em;
+    color: var(--fg-subtle);
+    white-space: nowrap;
+  }
+  .feed-row small.ok {
+    color: var(--color-ok);
+  }
+
+  /* ---------- chips flutuantes ---------- */
+  .chip {
+    --s: calc(100cqi / 84);
+    position: absolute;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: calc(var(--s) * 0.8);
+    padding: calc(var(--s) * 0.8) calc(var(--s) * 1.1);
+    border-radius: calc(var(--s) * 1.1);
+    font-size: max(12px, calc(var(--s) * 1));
+    border: 1px solid var(--hairline-strong);
+    background: color-mix(in oklab, var(--ink-800) 94%, transparent);
+    box-shadow: 0 1.4em 3em -1em rgb(0 0 0 / 0.55);
+    animation: float-y 6s ease-in-out infinite;
+  }
+  .chip b {
+    display: block;
+    font-size: 0.92em;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .chip small {
+    display: block;
+    margin-top: 0.15em;
+    font-size: 0.8em;
+    color: var(--fg-muted);
+    white-space: nowrap;
+  }
+  .chip-ico {
+    display: grid;
+    place-items: center;
+    width: 2.3em;
+    height: 2.3em;
+    border-radius: 0.7em;
+    flex-shrink: 0;
+  }
+  .chip-ico.ok {
+    color: var(--color-ok);
+    background: color-mix(in oklab, var(--color-ok) 15%, transparent);
+  }
+  .chip-ico.warn {
+    color: var(--color-warn);
+    background: color-mix(in oklab, var(--color-warn) 15%, transparent);
+  }
+  .chip-ico.pix {
+    color: var(--accent-2);
+    background: color-mix(in oklab, var(--accent-2) 15%, transparent);
+  }
+  .chip-bar {
+    display: block;
+    margin-top: 0.5em;
+    height: 0.3em;
+    border-radius: 99px;
+    background: color-mix(in oklab, var(--mist) 10%, transparent);
+    overflow: hidden;
+  }
+  .chip-bar i {
+    display: block;
+    width: 30%;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--color-warn);
+  }
+  /* posicionados sobre áreas "vazias" do painel: barra da janela e coluna lateral */
+  .chip-1 {
+    top: -3.2%;
+    right: 17%;
+  }
+  .chip-2 {
+    bottom: 9%;
+    left: -5.5%;
+    animation-delay: -3s;
+  }
+
+  /* ---------- layout compacto (container estreito) ---------- */
+  @container (max-width: 760px) {
+    .dash {
+      font-size: calc(100cqi / 40);
+    }
+    .body {
+      grid-template-columns: 1fr;
+    }
+    .side,
+    .search,
+    .bell,
+    .range,
+    .chip {
+      display: none;
+    }
+    .topbar {
+      justify-content: flex-end;
+      position: absolute;
+      top: 3.6em;
+      right: 1.4em;
+    }
+    .kpis {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .row {
+      grid-template-columns: 1fr;
+    }
+    .feed-row:nth-child(n + 4) {
+      display: none;
+    }
+    .main {
+      padding: 1.2em;
+    }
+    .head {
+      margin-top: 0.4em;
+    }
+  }
+</style>
+
+<script>
+  import { initDashboard } from '@/scripts/dashboard';
+  initDashboard();
+</script>

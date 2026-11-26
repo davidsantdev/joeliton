@@ -1,0 +1,104 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { messages, whatsappLink } from '@/config/site';
+---
+
+<a
+  href={whatsappLink(messages.talk)}
+  target="_blank"
+  rel="noopener noreferrer"
+  class="fab group fixed right-4 z-[70] inline-grid size-14 place-items-center rounded-full bg-whatsapp text-white sm:right-6"
+  aria-label="Falar com a J&E Soluções no WhatsApp"
+  data-fab
+>
+  <span class="fab-ring absolute inset-0 rounded-full" aria-hidden="true"></span>
+  <Icon name="whatsapp" size={28} class="relative" />
+  <span class="fab-tip" aria-hidden="true">Fale com a gente</span>
+</a>
+
+<style>
+  .fab {
+    bottom: calc(1rem + env(safe-area-inset-bottom));
+    box-shadow: 0 12px 32px -8px rgb(0 0 0 / 0.55);
+    animation: fab-in 0.6s var(--ease-out-expo) 1.2s backwards;
+    transition:
+      transform 0.35s var(--ease-out-expo),
+      opacity 0.35s,
+      visibility 0.35s;
+  }
+  @media (width >= 40rem) {
+    .fab {
+      bottom: calc(1.5rem + env(safe-area-inset-bottom));
+    }
+  }
+  .fab:hover {
+    transform: scale(1.07);
+  }
+  .fab:active {
+    transform: scale(0.95);
+  }
+  /* some quando o formulário de contato está na tela (ele já é o canal principal) */
+  .fab[data-hidden] {
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.6) translateY(12px);
+  }
+  .fab-ring {
+    border: 2px solid var(--color-whatsapp);
+    animation: fab-pulse 2.8s var(--ease-out-expo) infinite;
+  }
+  @keyframes fab-pulse {
+    0% {
+      transform: scale(1);
+      opacity: 0.7;
+    }
+    70%,
+    100% {
+      transform: scale(1.7);
+      opacity: 0;
+    }
+  }
+  .fab-tip {
+    position: absolute;
+    right: calc(100% + 0.75rem);
+    top: 50%;
+    translate: 0 -50%;
+    padding: 0.45rem 0.8rem;
+    border-radius: 0.7rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--fg);
+    background: var(--ink-800);
+    border: 1px solid var(--hairline-strong);
+    box-shadow: 0 10px 30px -10px rgb(0 0 0 / 0.5);
+    opacity: 0;
+    transform: translateX(6px);
+    transition:
+      opacity 0.25s,
+      transform 0.35s var(--ease-out-expo);
+    pointer-events: none;
+  }
+  @media (hover: hover) {
+    .fab:hover .fab-tip {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes fab-in {
+    from {
+      opacity: 0;
+      transform: scale(0.6) translateY(20px);
+    }
+  }
+</style>
+
+<script>
+  const fab = document.querySelector<HTMLElement>('[data-fab]');
+  const contact = document.getElementById('contato');
+  if (fab && contact) {
+    new IntersectionObserver(([entry]) => fab.toggleAttribute('data-hidden', entry.isIntersecting), {
+      threshold: 0.25,
+    }).observe(contact);
+  }
+</script>

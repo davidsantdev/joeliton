@@ -1,0 +1,62 @@
+---
+import { marqueeSegments } from '@/data/content';
+---
+
+<section aria-label="Segmentos atendidos" data-anim class="relative border-y hairline bg-ink-950/40 py-9">
+  <p class="text-center font-mono text-[0.7rem] font-semibold tracking-[0.22em] text-fg-subtle uppercase">
+    Feito para o dia a dia de
+  </p>
+  <!-- bordas esmaecidas com gradientes por cima (mais barato que mask numa camada animada) -->
+  <div class="marquee relative mt-6 overflow-hidden">
+    <div class="track flex w-max">
+      {
+        [0, 1].map((copy) => (
+          <ul class="flex shrink-0 items-center" aria-hidden={copy === 1 ? 'true' : undefined}>
+            {marqueeSegments.map((name) => (
+              <li class="flex items-center font-display text-xl font-semibold tracking-[-0.02em] whitespace-nowrap text-fg-muted sm:text-2xl">
+                <span class="px-6 sm:px-8">{name}</span>
+                <span class="sep" aria-hidden="true" />
+              </li>
+            ))}
+          </ul>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .marquee::before,
+  .marquee::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 1;
+    width: min(18%, 10rem);
+    pointer-events: none;
+    --edge: color-mix(in oklab, var(--ink-950) 40%, var(--bg));
+  }
+  .marquee::before {
+    left: 0;
+    background: linear-gradient(90deg, var(--edge), transparent);
+  }
+  .marquee::after {
+    right: 0;
+    background: linear-gradient(270deg, var(--edge), transparent);
+  }
+  .track {
+    animation: marquee 48s linear infinite;
+  }
+  .track:hover {
+    animation-play-state: paused;
+  }
+  .sep {
+    width: 0.45rem;
+    height: 0.45rem;
+    rotate: 45deg;
+    border-radius: 2px;
+    background: linear-gradient(135deg, var(--grad-from), var(--grad-to));
+    opacity: 0.8;
+  }
+</style>

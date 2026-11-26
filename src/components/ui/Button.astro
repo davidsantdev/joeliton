@@ -1,0 +1,39 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import Icon from './Icon.astro';
+
+type Variant = 'primary' | 'outline' | 'ghost';
+type Size = 'sm' | 'md' | 'lg';
+
+type Props = (HTMLAttributes<'a'> | HTMLAttributes<'button'>) & {
+  href?: string;
+  variant?: Variant;
+  size?: Size;
+  arrow?: boolean;
+  class?: string;
+};
+
+const { href, variant = 'primary', size = 'md', arrow = false, class: className, ...rest } = Astro.props;
+
+const classes = ['btn', `btn-${variant}`, size !== 'md' && `btn-${size}`, className];
+const isExternal = href ? /^https?:\/\//.test(href) : false;
+---
+
+{
+  href ? (
+    <a
+      href={href}
+      class:list={classes}
+      {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+      {...(rest as HTMLAttributes<'a'>)}
+    >
+      <slot />
+      {arrow && <Icon name="arrow-right" size={17} strokeWidth={2.2} class="btn-arrow" />}
+    </a>
+  ) : (
+    <button class:list={classes} {...(rest as HTMLAttributes<'button'>)}>
+      <slot />
+      {arrow && <Icon name="arrow-right" size={17} strokeWidth={2.2} class="btn-arrow" />}
+    </button>
+  )
+}

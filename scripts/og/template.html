@@ -1,0 +1,151 @@
+<!doctype html>
+<!--
+  Template da imagem de compartilhamento (1200×630).
+  Pode abrir este arquivo direto no navegador para ajustar; depois rode `npm run og`.
+-->
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <title>OG — J&amp;E Soluções</title>
+    <style>
+      @font-face {
+        font-family: 'Jakarta';
+        src: url('../../node_modules/@fontsource-variable/plus-jakarta-sans/files/plus-jakarta-sans-latin-wght-normal.woff2') format('woff2');
+        font-weight: 200 800;
+      }
+      @font-face {
+        font-family: 'Inter';
+        src: url('../../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2') format('woff2');
+        font-weight: 100 900;
+      }
+      @font-face {
+        font-family: 'Mono';
+        src: url('../../node_modules/@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2') format('woff2');
+        font-weight: 100 800;
+      }
+      * {
+        margin: 0;
+        box-sizing: border-box;
+      }
+      body {
+        position: relative;
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background: #060a13;
+        color: #edf2fa;
+        font-family: 'Inter', sans-serif;
+      }
+      .glow {
+        position: absolute;
+        right: -160px;
+        top: -220px;
+        width: 780px;
+        height: 560px;
+        border-radius: 50%;
+        background: radial-gradient(closest-side, rgb(53 128 228 / 0.42), transparent);
+        filter: blur(30px);
+      }
+      .grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(to right, rgb(255 255 255 / 0.05) 1px, transparent 1px),
+          linear-gradient(to bottom, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+        background-size: 56px 56px;
+        mask-image: radial-gradient(ellipse 70% 80% at 80% 30%, #000 20%, transparent 75%);
+      }
+      .dots {
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(rgb(95 200 232 / 0.55) 1.2px, transparent 1.6px);
+        background-size: 9px 9px;
+        mask-image: radial-gradient(ellipse 38% 55% at 88% 20%, #000 0%, transparent 70%);
+        opacity: 0.8;
+      }
+      .wrap {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 72px 80px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-family: 'Jakarta', sans-serif;
+        font-size: 30px;
+        letter-spacing: -0.02em;
+      }
+      .brand img {
+        height: 54px;
+        filter: brightness(1.18) saturate(1.08) drop-shadow(0 0 14px rgb(80 170 240 / 0.3));
+      }
+      .brand b {
+        font-weight: 800;
+      }
+      .brand span {
+        font-weight: 500;
+        color: #9eacc3;
+      }
+      .g {
+        background: linear-gradient(100deg, #69a5f7 15%, #5fd8eb 85%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .tag {
+        margin-top: auto;
+        font-family: 'Mono', monospace;
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #5fd3e8;
+      }
+      h1 {
+        max-width: 980px;
+        margin-top: 18px;
+        font-family: 'Jakarta', sans-serif;
+        font-size: 84px;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -0.045em;
+      }
+      .punct {
+        margin-left: -0.12em;
+      }
+      .foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 34px;
+        font-size: 24px;
+        color: #9eacc3;
+      }
+      .url {
+        font-family: 'Mono', monospace;
+        font-size: 20px;
+        color: #6e7b94;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="glow"></div>
+    <div class="grid"></div>
+    <div class="dots"></div>
+    <div class="wrap">
+      <div class="brand">
+        <img src="../../src/assets/brand/logo-mark.png" alt="" />
+        <b>J<span class="g">&amp;</span>E</b><span>Soluções</span>
+      </div>
+      <p class="tag">Automação comercial para o varejo</p>
+      <h1>Do caixa ao estoque<span class="punct">,</span><br />sua loja <span class="g">no controle<span class="punct">.</span></span></h1>
+      <div class="foot">
+        <span>Supermercados · Materiais de construção</span>
+        <span class="url">jesolution.com.br</span>
+      </div>
+    </div>
+  </body>
+</html>

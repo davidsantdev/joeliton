@@ -1,0 +1,251 @@
+---
+/** Tela ILUSTRATIVA de orçamento (loja de materiais de construção). As contas batem. */
+import Icon from '@/components/ui/Icon.astro';
+import { num } from '@/lib/chart';
+
+const items = [
+  { name: 'Cimento CP II 50 kg', qty: 20, unitLabel: 'sc', price: 34.9 },
+  { name: 'Areia média lavada', qty: 3, unitLabel: 'm³', price: 145 },
+  { name: 'Vergalhão CA-50 3/8"', qty: 12, unitLabel: 'br', price: 52.4 },
+  { name: 'Bloco cerâmico 9×19×29', qty: 1.5, unitLabel: 'mil', price: 890, note: '= 1.500 un' },
+  { name: 'Argamassa AC-I 20 kg', qty: 10, unitLabel: 'sc', price: 18.5 },
+].map((it) => ({ ...it, total: Math.round(it.qty * it.price * 100) / 100 }));
+
+const subtotal = items.reduce((s, it) => s + it.total, 0);
+const discountRate = 0.03;
+const discount = Math.round(subtotal * discountRate * 100) / 100;
+const total = Math.round((subtotal - discount) * 100) / 100;
+const qtyLabel = (q: number) => q.toLocaleString('pt-BR', { maximumFractionDigits: 3 });
+---
+
+<div class="mock-wrap">
+  <div
+    class="mock"
+    role="img"
+    aria-label={`Ilustração de um orçamento de materiais de construção com cinco itens, desconto de 3% e total de R$ ${num(total)}, pronto para virar pedido`}
+  >
+    <div class="head">
+      <div>
+        <p class="kicker">Orçamento <b>#2481</b></p>
+        <p class="client">Obra Residencial Ipê</p>
+        <p class="meta">Vendedor: Marcos · válido por 7 dias</p>
+      </div>
+      <span class="badge">Aguardando aprovação</span>
+    </div>
+
+    <div class="table">
+      <div class="thead"><span>Item</span><span>Qtd</span><span>Unit.</span><span>Total</span></div>
+      {
+        items.map((it) => (
+          <div class="tr">
+            <span class="name">
+              {it.name}
+              {it.note && <small>{it.note}</small>}
+            </span>
+            <span class="num">
+              {qtyLabel(it.qty)} <em>{it.unitLabel}</em>
+            </span>
+            <span class="num muted">{num(it.price)}</span>
+            <span class="num strong">{num(it.total)}</span>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="sum">
+      <div><span>Subtotal</span><span>R$ {num(subtotal)}</span></div>
+      <div class="disc"><span>Desconto à vista (3%)</span><span>− R$ {num(discount)}</span></div>
+      <div class="grand"><span>Total</span><span>R$ {num(total)}</span></div>
+    </div>
+
+    <div class="foot">
+      <span class="delivery"><Icon name="truck" size="1.25em" /> Entrega: amanhã · manhã</span>
+      <span class="convert">Converter em pedido <Icon name="arrow-right" size="1em" strokeWidth={2.4} /></span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .mock-wrap {
+    container-type: inline-size;
+  }
+  .mock {
+    --line: var(--hairline);
+    font-size: clamp(8px, calc(100cqi / 44), 13px);
+    border-radius: 1.3em;
+    border: 1px solid var(--hairline-strong);
+    background: var(--ink-850);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    color: var(--fg);
+    text-align: left;
+    user-select: none;
+  }
+  .head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1em;
+    padding: 1.2em 1.3em 1em;
+    border-bottom: 1px solid var(--line);
+    background: color-mix(in oklab, var(--ink-800) 60%, transparent);
+  }
+  .kicker {
+    font-size: 0.85em;
+    color: var(--fg-subtle);
+  }
+  .kicker b {
+    color: var(--fg-muted);
+    font-family: var(--font-mono);
+  }
+  .client {
+    margin-top: 0.2em;
+    font-family: var(--font-display);
+    font-size: 1.35em;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .meta {
+    margin-top: 0.15em;
+    font-size: 0.82em;
+    color: var(--fg-subtle);
+  }
+  .badge {
+    flex-shrink: 0;
+    padding: 0.35em 0.75em;
+    border-radius: 99px;
+    font-size: 0.78em;
+    font-weight: 600;
+    color: var(--color-warn);
+    background: color-mix(in oklab, var(--color-warn) 13%, transparent);
+  }
+  .table {
+    padding: 0.4em 1.3em 0.2em;
+  }
+  .thead,
+  .tr {
+    display: grid;
+    grid-template-columns: 1fr 5.2em 4.6em 5.4em;
+    gap: 0.6em;
+    align-items: baseline;
+  }
+  .thead {
+    padding: 0.6em 0;
+    font-size: 0.78em;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--fg-subtle);
+  }
+  .thead span:not(:first-child) {
+    text-align: right;
+  }
+  .tr {
+    padding: 0.62em 0;
+    border-top: 1px solid var(--line);
+  }
+  .name {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .name small {
+    font-size: 0.78em;
+    color: var(--accent-2);
+  }
+  .num {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .num em {
+    font-style: normal;
+    color: var(--fg-subtle);
+    font-size: 0.85em;
+  }
+  .muted {
+    color: var(--fg-muted);
+  }
+  .strong {
+    font-weight: 600;
+  }
+  .sum {
+    margin: 0.4em 1.3em 0;
+    padding: 0.8em 0 0.9em;
+    border-top: 1px dashed var(--hairline-strong);
+    display: flex;
+    flex-direction: column;
+    gap: 0.35em;
+    font-variant-numeric: tabular-nums;
+  }
+  .sum div {
+    display: flex;
+    justify-content: space-between;
+    color: var(--fg-muted);
+  }
+  .sum .disc span:last-child {
+    color: var(--color-ok);
+  }
+  .sum .grand {
+    margin-top: 0.3em;
+    color: var(--fg);
+    font-family: var(--font-display);
+    font-size: 1.45em;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1em;
+    padding: 0.9em 1.3em;
+    border-top: 1px solid var(--line);
+    background: color-mix(in oklab, var(--ink-800) 45%, transparent);
+  }
+  .delivery {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    color: var(--fg-muted);
+  }
+  .delivery :global(svg) {
+    color: var(--accent-2);
+  }
+  .convert {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    padding: 0.7em 1em;
+    border-radius: 0.7em;
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--btn-fg);
+    background: linear-gradient(100deg, var(--btn-from), var(--btn-to));
+  }
+  @container (max-width: 520px) {
+    .mock {
+      font-size: calc(100cqi / 31);
+    }
+    .thead,
+    .tr {
+      grid-template-columns: 1fr 5em 5.4em;
+    }
+    .thead span:nth-child(3),
+    .tr .muted {
+      display: none;
+    }
+    .badge {
+      display: none;
+    }
+    .foot {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .convert {
+      justify-content: center;
+    }
+  }
+</style>

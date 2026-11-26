@@ -1,0 +1,31 @@
+# Usado apenas se a hospedagem for Apache (ex.: Hostinger, HostGator, cPanel).
+# Em Vercel / Netlify / Cloudflare Pages este arquivo é simplesmente ignorado.
+
+ErrorDocument 404 /404.html
+
+# Redirecionamentos de HTTPS / sem "www": normalmente o painel da hospedagem já faz.
+# Se não fizer, descomente (atenção a loops atrás de proxies como o Cloudflare "Flexible").
+# <IfModule mod_rewrite.c>
+#   RewriteEngine On
+#   RewriteCond %{HTTPS} !=on
+#   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+#   RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+#   RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+# </IfModule>
+
+<IfModule mod_headers.c>
+  # Tudo em /_astro/ tem hash no nome (gerado pelo build): cache "para sempre".
+  <If "%{REQUEST_URI} =~ m#^/_astro/#">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </If>
+  <FilesMatch "\.(html|xml|webmanifest|txt)$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml application/manifest+json
+</IfModule>

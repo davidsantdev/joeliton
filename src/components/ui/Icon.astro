@@ -1,0 +1,33 @@
+---
+import { getIcon, type IconName } from '@/lib/icons';
+
+interface Props {
+  name: IconName;
+  class?: string;
+  size?: number | string;
+  strokeWidth?: number;
+  /** Quando informado, o ícone é anunciado por leitores de tela. Senão, é decorativo. */
+  label?: string;
+}
+
+const { name, class: className, size = 24, strokeWidth = 1.75, label } = Astro.props;
+const { body, filled } = getIcon(name);
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  width={size}
+  height={size}
+  fill={filled ? 'currentColor' : 'none'}
+  stroke={filled ? 'none' : 'currentColor'}
+  stroke-width={filled ? undefined : strokeWidth}
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  class={className}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  focusable="false"
+  set:html={body}
+/>

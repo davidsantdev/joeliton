@@ -1,0 +1,50 @@
+---
+import Base from '@/layouts/Base.astro';
+import Logo from '@/components/brand/Logo.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import DitherCanvas from '@/components/fx/DitherCanvas.astro';
+import ThemeToggle from '@/components/layout/ThemeToggle.astro';
+import { contactLink, hasWhatsapp, messages } from '@/config/site';
+---
+
+<Base title="Página não encontrada | J&E Soluções" noindex>
+  <main id="conteudo" class="relative isolate flex min-h-svh flex-col overflow-hidden" data-dither-host>
+    <DitherCanvas class="absolute inset-0 -z-10 h-full w-full" cell={2} focus="0.5,0.5" fadeBottom />
+    <div class="vignette absolute inset-0 -z-10" aria-hidden="true"></div>
+
+    <header class="container-x flex items-center justify-between py-5">
+      <a href="/" class="rounded-lg" aria-label="J&E Soluções — página inicial"><Logo eager /></a>
+      <ThemeToggle />
+    </header>
+
+    <section class="container-x flex flex-1 flex-col items-center justify-center pb-24 text-center">
+      <p class="enter font-mono text-sm font-semibold tracking-[0.2em] text-accent-2 uppercase">Erro 404</p>
+      <h1 class="enter mt-5 max-w-3xl text-5xl leading-[1.02] font-extrabold tracking-[-0.045em] text-fg sm:text-7xl" style="--d: 80">
+        Essa página saiu do <span class="text-gradient">estoque</span><span class="punct">.</span>
+      </h1>
+      <p class="enter mt-6 max-w-md text-base leading-relaxed text-fg-muted sm:text-lg" style="--d: 160">
+        O endereço que você acessou não existe ou mudou de lugar. Mas o resto da loja continua aberto.
+      </p>
+      <div class="enter mt-10 flex flex-col gap-3 sm:flex-row" style="--d: 240">
+        <Button href="/" size="lg" arrow>Voltar ao início</Button>
+        <Button href={contactLink(messages.talk)} variant="outline" size="lg">
+          {
+            hasWhatsapp ? (
+              <Icon name="whatsapp" size={18} class="text-whatsapp" />
+            ) : (
+              <Icon name="mail" size={18} class="text-accent-2" />
+            )
+          }
+          {hasWhatsapp ? 'Falar no WhatsApp' : 'Falar com a gente'}
+        </Button>
+      </div>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .vignette {
+    background: radial-gradient(ellipse 60% 55% at 50% 50%, transparent 10%, var(--bg) 85%);
+  }
+</style>

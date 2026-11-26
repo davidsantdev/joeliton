@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://jesolution.com.br/sitemap-index.xml

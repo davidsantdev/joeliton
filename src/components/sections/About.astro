@@ -1,0 +1,211 @@
+---
+import { Image } from 'astro:assets';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import logoMark from '@/assets/brand/logo-mark.png';
+import { benefits, hubNodes } from '@/data/content';
+import { messages, contactLink } from '@/config/site';
+
+// posições dos nós num círculo (em % do quadrado), começando no topo
+const R = 39;
+const nodes = hubNodes.map((n, i) => {
+  const a = (-90 + (360 / hubNodes.length) * i) * (Math.PI / 180);
+  return { ...n, x: +(50 + R * Math.cos(a)).toFixed(2), y: +(50 + R * Math.sin(a)).toFixed(2), i };
+});
+---
+
+<section id="sobre" class="cv relative py-24 sm:py-32" aria-labelledby="sobre-titulo">
+  <div class="container-x grid items-center gap-16 lg:grid-cols-2 lg:gap-12">
+    <!-- diagrama: tudo conectado, como no logo -->
+    <div class="hub-wrap mx-auto w-[80%] max-w-[34rem] sm:w-full" data-reveal="scale">
+      <div class="hub" data-anim role="img" aria-label="Diagrama: a J&E Soluções no centro, conectada a PDV, estoque, fiscal, financeiro, pagamentos, balança, e-commerce e relatórios">
+        <svg class="hub-lines" viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="50" cy="50" r={R} class="ring"></circle>
+          <circle cx="50" cy="50" r={R * 0.55} class="ring ring-inner"></circle>
+          {
+            nodes.map((n) => (
+              <>
+                <line x1="50" y1="50" x2={n.x} y2={n.y} class="spoke" />
+                <line
+                  x1={n.i % 2 ? n.x : 50}
+                  y1={n.i % 2 ? n.y : 50}
+                  x2={n.i % 2 ? 50 : n.x}
+                  y2={n.i % 2 ? 50 : n.y}
+                  class="packet"
+                  pathLength="100"
+                  style={`animation-delay:${-n.i * 0.45}s`}
+                />
+              </>
+            ))
+          }
+        </svg>
+
+        <div class="core">
+          <Image src={logoMark} alt="" width={160} class="core-logo" />
+        </div>
+
+        {
+          nodes.map((n) => (
+            <span class="hub-node" style={`left:${n.x}%; top:${n.y}%`}>
+              <Icon name={n.icon} size={16} />
+              {n.label}
+            </span>
+          ))
+        }
+      </div>
+    </div>
+
+    <div>
+      <span class="eyebrow" data-reveal>Sobre a J&amp;E</span>
+      <h2
+        id="sobre-titulo"
+        class="mt-5 text-[2.15rem] leading-[1.06] font-bold tracking-[-0.035em] text-fg sm:text-5xl"
+        data-reveal
+        style="--d: 60"
+      >
+        Tecnologia que <span class="text-gradient">conecta</span> toda a sua operação
+      </h2>
+      <p class="mt-5 max-w-xl text-base leading-relaxed text-fg-muted sm:text-lg" data-reveal style="--d: 120">
+        Nossa missão é transformar o varejo com tecnologia: softwares que otimizam a operação e impulsionam resultados — com
+        a proximidade de quem conhece o balcão, o estoque e o caixa por dentro.
+      </p>
+
+      <ul class="mt-10 grid gap-x-8 gap-y-7 sm:grid-cols-2">
+        {
+          benefits.map((b, i) => (
+            <li class="flex gap-3.5" data-reveal style={`--d:${80 + i * 60}`}>
+              <span class="mt-0.5 inline-grid size-10 shrink-0 place-items-center rounded-xl border border-mist/10 bg-mist/[0.04] text-accent-2">
+                <Icon name={b.icon} size={19} />
+              </span>
+              <span>
+                <span class="block font-display font-semibold tracking-[-0.01em] text-fg">{b.title}</span>
+                <span class="mt-1 block text-[0.92rem] leading-relaxed text-fg-muted">{b.text}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="mt-10" data-reveal>
+        <Button href={contactLink(messages.talk)} arrow>Falar com um especialista</Button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hub {
+    position: relative;
+    aspect-ratio: 1;
+    width: 100%;
+    container-type: inline-size;
+  }
+  .hub::before {
+    content: '';
+    position: absolute;
+    inset: 18%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, color-mix(in oklab, var(--color-brand-500) 24%, transparent) 10%, transparent);
+  }
+  .hub-lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .ring {
+    fill: none;
+    stroke: var(--hairline-strong);
+    stroke-width: 0.3;
+    stroke-dasharray: 0.8 1.6;
+    transform-origin: 50% 50%;
+    animation: spin-slow 90s linear infinite;
+  }
+  .ring-inner {
+    stroke: color-mix(in oklab, var(--accent-2) 30%, transparent);
+    animation-direction: reverse;
+    animation-duration: 60s;
+  }
+  .spoke {
+    stroke: var(--hairline-strong);
+    stroke-width: 0.3;
+  }
+  .packet {
+    stroke: var(--accent-2);
+    stroke-width: 0.9;
+    stroke-linecap: round;
+    stroke-dasharray: 3 97;
+    filter: drop-shadow(0 0 1.2px var(--accent-2));
+    animation: packet 3.6s linear infinite;
+  }
+
+  .core {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 30%;
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 1px solid color-mix(in oklab, var(--accent-2) 35%, transparent);
+    background:
+      radial-gradient(circle at 30% 25%, color-mix(in oklab, var(--accent-2) 18%, transparent), transparent 60%),
+      var(--ink-850);
+    box-shadow:
+      0 0 0 8px color-mix(in oklab, var(--accent-2) 6%, transparent),
+      0 0 60px -10px color-mix(in oklab, var(--accent) 70%, transparent);
+  }
+  .core::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    border: 1px solid var(--accent-2);
+    opacity: 0.5;
+    animation: pulse-ring 3.2s var(--ease-out-expo) infinite;
+  }
+  .core :global(.core-logo) {
+    width: 62%;
+    height: auto;
+  }
+
+  .hub-node {
+    position: absolute;
+    translate: -50% -50%;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid var(--hairline-strong);
+    background: color-mix(in oklab, var(--ink-850) 94%, transparent);
+    font-size: clamp(0.7rem, 2.6cqi, 0.86rem);
+    font-weight: 600;
+    color: var(--fg);
+    white-space: nowrap;
+    box-shadow: 0 8px 24px -12px rgb(0 0 0 / 0.6);
+    transition:
+      border-color 0.3s,
+      transform 0.4s var(--ease-out-expo);
+  }
+  .hub-node :global(svg) {
+    color: var(--accent-2);
+  }
+  @media (width < 40rem) {
+    .hub-node {
+      gap: 0.35rem;
+      padding: 0.4rem 0.6rem;
+    }
+    .hub-node :global(svg) {
+      width: 14px;
+      height: 14px;
+    }
+  }
+  .hub-node:hover {
+    border-color: color-mix(in oklab, var(--accent-2) 50%, transparent);
+    transform: scale(1.05);
+  }
+</style>

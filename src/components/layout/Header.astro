@@ -1,0 +1,159 @@
+---
+import Logo from '@/components/brand/Logo.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import ThemeToggle from './ThemeToggle.astro';
+import { messages, nav, contactLink } from '@/config/site';
+---
+
+<header class="site-header fixed inset-x-0 top-0 z-50 flex justify-center px-3 pt-3 sm:px-4 sm:pt-4" data-header>
+  <nav
+    aria-label="Principal"
+    class="nav-shell relative flex w-full max-w-6xl items-center justify-between gap-3 rounded-2xl border border-transparent py-2 pr-2 pl-3 sm:pl-4"
+  >
+    <a href="#inicio" class="shrink-0 rounded-lg py-1" aria-label="J&E Soluções — voltar ao início">
+      <Logo eager />
+    </a>
+
+    <ul class="relative hidden items-center lg:flex" data-nav-links>
+      <li aria-hidden="true" class="nav-indicator" data-nav-indicator></li>
+      {
+        nav.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class="nav-link relative z-10 block rounded-full px-3.5 py-2 text-sm font-medium text-fg-muted transition-colors duration-200 hover:text-fg"
+              data-nav-link
+            >
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="flex items-center gap-2">
+      <ThemeToggle />
+      <Button href={contactLink(messages.demo)} size="sm" class="hidden sm:inline-flex">
+        Agendar demonstração
+      </Button>
+      <button
+        type="button"
+        class="menu-btn inline-flex size-9 items-center justify-center rounded-full border border-mist/10 bg-mist/[0.03] text-fg lg:hidden"
+        aria-expanded="false"
+        aria-controls="menu-mobile"
+        aria-label="Abrir menu"
+        data-menu-toggle
+      >
+        <Icon name="menu" size={19} class="icon-open" />
+        <Icon name="x" size={19} class="icon-close" />
+      </button>
+    </div>
+  </nav>
+
+  <div
+    id="menu-mobile"
+    class="mobile-menu absolute inset-x-3 top-[4.6rem] rounded-2xl border border-mist/10 bg-ink-850/95 p-2.5 shadow-2xl shadow-black/40 backdrop-blur-xl sm:inset-x-4 lg:hidden"
+    hidden
+    data-mobile-menu
+  >
+    <ul class="flex flex-col">
+      {
+        nav.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class="flex items-center justify-between rounded-xl px-4 py-3.5 text-base font-medium text-fg-muted transition-colors hover:bg-mist/[0.05] hover:text-fg"
+              data-nav-link
+            >
+              {item.label}
+              <Icon name="arrow-right" size={16} class="opacity-40" />
+            </a>
+          </li>
+        ))
+      }
+      <li class="mt-2 px-1 pb-1.5">
+        <Button href={contactLink(messages.demo)} class="w-full" arrow>
+          Agendar demonstração
+        </Button>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<style>
+  .nav-shell {
+    transition:
+      background-color 0.5s var(--ease-out-expo),
+      border-color 0.5s,
+      box-shadow 0.5s,
+      backdrop-filter 0.5s;
+  }
+  :global([data-header][data-scrolled]) .nav-shell,
+  :global([data-header][data-open]) .nav-shell {
+    border-color: var(--hairline);
+    background: color-mix(in oklab, var(--ink-900) 72%, transparent);
+    backdrop-filter: blur(16px) saturate(1.5);
+    -webkit-backdrop-filter: blur(16px) saturate(1.5);
+    box-shadow: 0 10px 40px -16px rgb(0 0 0 / 0.55);
+  }
+
+  /* Pílula que desliza entre os links (seção ativa ou link em hover) */
+  .nav-indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: var(--w, 0px);
+    transform: translateX(var(--x, 0px));
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--mist) 7%, transparent);
+    border: 1px solid var(--hairline);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform 0.45s var(--ease-out-expo),
+      width 0.45s var(--ease-out-expo),
+      opacity 0.3s;
+  }
+  .nav-indicator[data-visible] {
+    opacity: 1;
+  }
+  .nav-link[aria-current='true'] {
+    color: var(--fg);
+  }
+
+  .menu-btn :global(svg) {
+    position: absolute;
+    transition:
+      transform 0.4s var(--ease-out-expo),
+      opacity 0.25s;
+  }
+  .menu-btn :global(.icon-close) {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.5);
+  }
+  .menu-btn[aria-expanded='true'] :global(.icon-open) {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.5);
+  }
+  .menu-btn[aria-expanded='true'] :global(.icon-close) {
+    opacity: 1;
+    transform: none;
+  }
+
+  .mobile-menu:not([hidden]) {
+    animation: menu-in 0.35s var(--ease-out-expo);
+  }
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.98);
+    }
+  }
+</style>
+
+<script>
+  import { initHeader } from '@/scripts/header';
+  initHeader();
+</script>

@@ -1,0 +1,77 @@
+---
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import FeatureVisual from '@/components/mockups/FeatureVisual.astro';
+import { features } from '@/data/content';
+---
+
+<section id="solucoes" class="cv relative py-24 sm:py-32" aria-labelledby="solucoes-titulo">
+  <div class="container-x">
+    <SectionHeading
+      id="solucoes-titulo"
+      eyebrow="Soluções"
+      subtitle="Do frente de caixa ao financeiro, cada módulo conversa com o outro — e você enxerga o negócio inteiro em tempo real."
+    >
+      Tudo o que a sua loja precisa, <span class="text-gradient">em um só sistema</span>
+    </SectionHeading>
+
+    <div class="bento mt-16 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        features.map((f, i) => (
+          <article
+            class:list={['spot spot-lift flex flex-col p-5 sm:p-6', f.span, `card-${f.id}`]}
+            data-reveal
+            style={`--d:${(i % 4) * 70}`}
+          >
+            <div class="visual">
+              <FeatureVisual kind={f.visual} />
+            </div>
+            <div class="mt-6">
+              <h3 class="font-display text-lg font-semibold tracking-[-0.015em] text-fg sm:text-[1.2rem]">{f.title}</h3>
+              <p class="mt-2 text-[0.94rem] leading-relaxed text-fg-muted">{f.description}</p>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .visual {
+    height: 10.5rem;
+  }
+  .card-pdv .visual {
+    position: relative;
+    flex: 1;
+    min-height: 18rem;
+    margin: -1.25rem -1.25rem 0;
+    padding: 1.25rem 1.25rem 0;
+  }
+  /* malha pontilhada atrás do cupom, para o card grande não parecer vazio */
+  .card-pdv .visual::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(color-mix(in oklab, var(--mist) 13%, transparent) 1px, transparent 1.4px);
+    background-size: 18px 18px;
+    mask-image: radial-gradient(ellipse 65% 60% at 50% 50%, #000 20%, transparent 75%);
+    pointer-events: none;
+  }
+  @media (width >= 40rem) {
+    .card-pdv .visual {
+      margin: -1.5rem -1.5rem 0;
+      padding: 1.5rem 1.5rem 0;
+    }
+  }
+  .card-sob-medida .visual {
+    height: 11.5rem;
+  }
+  .card-pdv {
+    --spot: rgb(90 160 245 / 0.2);
+  }
+  .card-sob-medida {
+    background:
+      radial-gradient(120% 120% at 100% 0%, color-mix(in oklab, var(--color-brand-500) 14%, transparent), transparent 55%),
+      var(--card);
+  }
+</style>

@@ -1,0 +1,29 @@
+---
+/** Barra de progresso de leitura: CSS scroll-driven animations, com fallback em JS (interactions.ts). */
+---
+
+<div class="scroll-progress" data-scroll-progress aria-hidden="true"></div>
+
+<style>
+  .scroll-progress {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 60;
+    height: 2px;
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    background: linear-gradient(90deg, var(--btn-from), var(--btn-to));
+    pointer-events: none;
+  }
+  @supports (animation-timeline: scroll()) {
+    .scroll-progress {
+      animation: progress-grow linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+  @keyframes progress-grow {
+    to {
+      transform: scaleX(1);
+    }
+  }
+</style>

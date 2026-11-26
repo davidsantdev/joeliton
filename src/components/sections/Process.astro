@@ -1,0 +1,87 @@
+---
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { steps } from '@/data/content';
+---
+
+<section id="como-funciona" class="cv relative py-24 sm:py-32" aria-labelledby="como-funciona-titulo">
+  <div class="container-x">
+    <SectionHeading
+      id="como-funciona-titulo"
+      eyebrow="Como funciona"
+      subtitle="Sem pacote engessado e sem largar você sozinho depois da instalação. A gente caminha junto em cada etapa."
+    >
+      Da primeira conversa ao <span class="text-gradient">sistema rodando</span>
+    </SectionHeading>
+
+    <ol class="steps relative mt-16 grid gap-5 sm:grid-cols-2 lg:mt-20 lg:grid-cols-4 lg:gap-6" data-inview>
+      <li class="track" aria-hidden="true"><span class="track-fill"></span></li>
+      {
+        steps.map((step, i) => (
+          <li class="step relative" data-reveal style={`--d:${i * 120}`}>
+            <div class="spot spot-lift h-full p-6">
+              <span class="node">
+                <Icon name={step.icon} size={20} />
+              </span>
+              <p class="mt-6 font-mono text-[0.7rem] font-semibold tracking-[0.2em] text-accent-2 uppercase">
+                Etapa {String(i + 1).padStart(2, '0')}
+              </p>
+              <h3 class="mt-2 font-display text-xl font-semibold tracking-[-0.02em] text-fg">{step.title}</h3>
+              <p class="mt-2.5 text-[0.95rem] leading-relaxed text-fg-muted">{step.description}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .node {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 1rem;
+    color: var(--accent-2);
+    border: 1px solid color-mix(in oklab, var(--accent-2) 30%, transparent);
+    background: color-mix(in oklab, var(--ink-850) 85%, var(--accent-2));
+    /* "recorta" a linha do trilho em volta do ícone, na cor do card */
+    box-shadow: 0 0 0 7px color-mix(in oklab, var(--ink-850) 72%, var(--bg));
+  }
+
+  /* linha que conecta as etapas (desktop) e se preenche quando a seção entra na tela */
+  .track {
+    display: none;
+  }
+  @media (width >= 64rem) {
+    .track {
+      display: block;
+      position: absolute;
+      left: 3rem;
+      right: 3rem;
+      top: 3rem;
+      height: 2px;
+      border-radius: 2px;
+      background: var(--hairline-strong);
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .track-fill {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--grad-from), var(--grad-to));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 1.8s var(--ease-in-out-quart) 0.3s;
+    }
+    .steps:global(.is-in) .track-fill,
+    :global(html:not(.js)) .track-fill {
+      transform: none;
+    }
+    .step {
+      z-index: 1;
+    }
+  }
+</style>
